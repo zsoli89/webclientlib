@@ -56,4 +56,21 @@ public class WebClientService implements WebClientServiceInterface{
         }
     }
 
+    public String callPostMicroserviceGetString(String port, String endpoint, String object) {
+        String url = BASE_URL.formatted(port) + endpoint;
+        logger.info(CALL_INFO.formatted(url));
+        try {
+            return webClient
+                    .post()
+                    .uri(url)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Mono.just(object), String.class)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (WebClientResponseException exception) {
+            throw new RuntimeException(INTERNAL_ERROR.formatted(url, exception.getResponseBodyAsString()));
+        }
+    }
+
 }
